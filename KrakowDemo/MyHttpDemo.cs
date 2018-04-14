@@ -6,25 +6,35 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.WebJobs.Host;
 using Newtonsoft.Json;
+using KrakowDemo.Classes;
+using KrakowDemo.DTOs;
+using System;
 
 namespace KrakowDemo
 {
-    public static class MyHttpDemo
+    public static class CreateOrder
     {
-        [FunctionName("MyHttpDemo")]
-        public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "saveMessage")]HttpRequest req, TraceWriter log)
+        [FunctionName(nameof(CreateOrder))]
+        public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")]HttpRequest req, 
+            TraceWriter log, [Table("Orders", Connection = "LocalStorageConnectionString")] ICollector<Order> outputTable)
         {
-            log.Info("C# HTTP trigger function processed a request.");
-
-            string name = req.Query["name"];
-
             string requestBody = new StreamReader(req.Body).ReadToEnd();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            var data = JsonConvert.DeserializeObject<OrderDTO>(requestBody);
+            outputTable.Add(new Order
+            {
+                CustomerName = data.CustomerName,
+                Email = data.Email,
+                Filename = data.Filename,
+                SizeX = data.SizeX,
+                SizeY = data.SizeY,
+                RowKey = Guid.NewGuid().ToString(),
+                PartitionKey = "AzureStorageConnectionString"
+            });
 
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            return new OkResult();
+            //return name != null
+            //    ? (ActionResult)new OkObjectResult($"Hello, {name}")
+            //    : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
         }
     }
 }
