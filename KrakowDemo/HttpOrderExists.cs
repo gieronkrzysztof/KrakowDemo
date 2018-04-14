@@ -11,6 +11,7 @@ using Microsoft.WindowsAzure.Storage.Blob;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Jpeg;
 using Microsoft.WindowsAzure.Storage;
+using System;
 
 namespace KrakowDemo
 {
@@ -67,5 +68,35 @@ namespace KrakowDemo
         public string FileName { get; set; }
         public int RequiredWidth { get; set; }
         public int RequiredHeight { get; set; }
+    }
+
+
+    public static class HttpGetSharedAccessSignatureForBlob
+    {
+        [FunctionName("HttpGetSharedAccessSignatureForBlob")]
+        public static async System.Threading.Tasks.Task<IActionResult> RunAsync([HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequest req,
+            [Blob("doneorders", FileAccess.Read, Connection = "AzureStorageConnectionString")]CloudBlobContainer photosContainer,
+            TraceWriter log)
+        {
+            string fileName = req.Query["fileName"];
+            if (string.IsNullOrWhiteSpace(fileName))
+                return new BadRequestResult();
+
+            var photoBlob = await photosContainer.GetBlobReferenceFromServerAsync(fileName);
+            var photoUri = GetBlobSasUri(photoBlob);
+            return new JsonResult(new { PhotoUri = photoUri });
+        }
+
+        static string GetBlobSasUri(ICloudBlob cloudBlob)
+        {
+            SharedAccessBlobPolicy sasConstraints = new SharedAccessBlobPolicy();
+            sasConstraints.SharedAccessStartTime = DateTimeOffset.UtcNow.AddHours(-1);
+            sasConstraints.SharedAccessExpiryTime = DateTimeOffset.UtcNow.AddHours(24);
+            sasConstraints.Permissions = SharedAccessBlobPermissions.List | SharedAccessBlobPermissions.Read;
+
+            string sasToken = cloudBlob.GetSharedAccessSignature(sasConstraints);
+
+            return cloudBlob.Uri + sasToken;
+        }
     }
 }
