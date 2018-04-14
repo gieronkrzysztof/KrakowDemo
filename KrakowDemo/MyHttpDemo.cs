@@ -12,7 +12,7 @@ namespace KrakowDemo
     public static class MyHttpDemo
     {
         [FunctionName("MyHttpDemo")]
-        public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "saveMessage/{id}")]HttpRequest req, TraceWriter log)
+        public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "saveMessage")]HttpRequest req, TraceWriter log)
         {
             log.Info("C# HTTP trigger function processed a request.");
 
