@@ -35,7 +35,7 @@ namespace KrakowDemo
             }
             catch (Exception ex)
             {
-                return new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+                return new BadRequestObjectResult(ex.Message);
             }
 
             return new OkResult();
