@@ -34,7 +34,8 @@ namespace KrakowDemo
                     firstElement.CustomerName,
                     firstElement.Filename,
                     firstElement.SizeY,
-                    firstElement.SizeX
+                    firstElement.SizeX,
+                    firstElement.Email
                 });
             }
 
