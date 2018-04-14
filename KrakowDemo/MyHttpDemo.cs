@@ -18,18 +18,25 @@ namespace KrakowDemo
         public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")]HttpRequest req, 
             TraceWriter log, [Table("Orders", Connection = "AzureStorageConnectionString")] ICollector<Order> outputTable)
         {
-            string requestBody = new StreamReader(req.Body).ReadToEnd();
-            var data = JsonConvert.DeserializeObject<OrderDTO>(requestBody);
-            outputTable.Add(new Order
+            try
             {
-                CustomerName = data.CustomerName,
-                Email = data.Email,
-                Filename = data.Filename,
-                SizeX = data.SizeX,
-                SizeY = data.SizeY,
-                RowKey = Guid.NewGuid().ToString(),
-                PartitionKey = "Orders"
-            });
+                string requestBody = new StreamReader(req.Body).ReadToEnd();
+                var data = JsonConvert.DeserializeObject<OrderDTO>(requestBody);
+                outputTable.Add(new Order
+                {
+                    CustomerName = data.CustomerName,
+                    Email = data.Email,
+                    Filename = data.Filename,
+                    SizeX = data.SizeX,
+                    SizeY = data.SizeY,
+                    RowKey = Guid.NewGuid().ToString(),
+                    PartitionKey = "Orders"
+                });
+            }
+            catch (Exception ex)
+            {
+                return new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            }
 
             return new OkResult();
             //return name != null
