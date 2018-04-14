@@ -33,7 +33,7 @@ namespace KrakowDemo
                 {
                     firstElement.CustomerName,
                     firstElement.Filename,
-                    firstElement. SizeY,
+                    firstElement.SizeY,
                     firstElement.SizeX
                 });
             }
