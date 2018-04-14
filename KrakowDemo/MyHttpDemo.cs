@@ -16,7 +16,7 @@ namespace KrakowDemo
     {
         [FunctionName(nameof(CreateOrder))]
         public static IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")]HttpRequest req, 
-            TraceWriter log, [Table("Orders", Connection = "LocalStorageConnectionString")] ICollector<Order> outputTable)
+            TraceWriter log, [Table("Orders", Connection = "AzureStorageConnectionString")] ICollector<Order> outputTable)
         {
             string requestBody = new StreamReader(req.Body).ReadToEnd();
             var data = JsonConvert.DeserializeObject<OrderDTO>(requestBody);
@@ -28,7 +28,7 @@ namespace KrakowDemo
                 SizeX = data.SizeX,
                 SizeY = data.SizeY,
                 RowKey = Guid.NewGuid().ToString(),
-                PartitionKey = "AzureStorageConnectionString"
+                PartitionKey = "Orders"
             });
 
             return new OkResult();
