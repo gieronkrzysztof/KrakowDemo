@@ -16,7 +16,7 @@ namespace KrakowDemo
     public static class HttpRetrieveOrder
     {
         [FunctionName(nameof(HttpRetrieveOrder))]
-        public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "get",  Route = null)]HttpRequest req,
+        public static async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get",  Route = null)]HttpRequest req,
             [Table("Orders", Connection = "AzureStorageConnectionString")]CloudTable ordersTable, TraceWriter log)
         {
             string fileName = req.Query["fileName"];
