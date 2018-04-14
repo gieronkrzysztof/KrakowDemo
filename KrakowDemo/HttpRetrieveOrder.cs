@@ -22,7 +22,7 @@ namespace KrakowDemo
             string fileName = req.Query["fileName"];
             if (string.IsNullOrWhiteSpace(fileName))
                 return new BadRequestResult();
-            TableQuery<Order> query = new TableQuery<Order>().Where(TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.Equal, fileName));
+            TableQuery<Order> query = new TableQuery<Order>().Where(TableQuery.GenerateFilterCondition("Filename", QueryComparisons.Equal, fileName));
             TableQuerySegment<Order> tableQueryResult = await ordersTable.ExecuteQuerySegmentedAsync(query, null);
             var resultList = tableQueryResult.Results;
 
